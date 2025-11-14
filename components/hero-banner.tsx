@@ -11,7 +11,7 @@ export default function HeroBanner() {
   }
 
   return (
-    <section className="relative w-full overflow-hidden pt-20">
+    <section className="relative w-full overflow-hidden pt-1">
       <div className="relative w-full aspect-video md:aspect-auto md:min-h-screen">
         <Image
           src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/BANNER-02-IKGWPZBdjlezN3kNhOOa7zhHxNaBtE.png"
