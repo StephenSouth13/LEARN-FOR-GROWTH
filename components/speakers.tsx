@@ -67,7 +67,7 @@ export default function Speakers() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
-            Diễn <span className="text-accent">giá</span>
+            Diễn <span className="text-accent">giả</span>
           </h2>
           <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto text-lg">
             Gặp gỡ các chuyên gia hàng đầu trong lĩnh vực kinh doanh và phát triển nhân sự
