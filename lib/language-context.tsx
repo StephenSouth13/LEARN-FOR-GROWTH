@@ -1,3 +1,4 @@
+//lib/language-context.tsx
 'use client'
 
 import { createContext, useContext, useState, useEffect } from 'react'
@@ -27,7 +28,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('language', lang)
   }
 
-  if (!mounted) return children
+  if (!mounted) {
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage }}>
+      {children}
+    </LanguageContext.Provider>
+  )
+}
+
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage }}>
