@@ -86,7 +86,7 @@ export default function AdminDashboard() {
         },
         {
           id: '2',
-          name: 'Phan Huyền Anh',
+          name: 'Phan Huỳnh Anh',
           title: 'Tiến sĩ, Kinh tế',
           image: '/professional-man-business.jpg',
           bio: 'Nghiên cứu viên hàng đầu trong lĩnh vực kinh tế doanh nghiệp'
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
         },
         {
           id: '5',
-          name: 'Dương Thế Khai',
+          name: 'Dương Thế Khải',
           title: 'Chủ tịch Vietnam Student Marathon',
           image: '/professional-man-casual.jpg',
           bio: 'Nhà tổ chức sự kiện và lãnh đạo cộng đồng sinh viên'
