@@ -57,6 +57,13 @@ export default function Speakers() {
           image: '/professional-man-casual.jpg',
           bio: 'Nhà tổ chức sự kiện và lãnh đạo cộng đồng sinh viên'
         },
+        {
+          id: '6',
+          name: 'Nguyễn Trang',
+          title: 'Quán quân Your Voice Our Voice 2025',
+          image: '/professional-man-casual.jpg',
+          bio: 'Tân quán quân Your Voice Our Voice 2025. Á Khôi Đại sứ Văn hóa ASEAN'
+        },
       ]
       setSpeakers(defaultSpeakers)
     }
