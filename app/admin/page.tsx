@@ -45,9 +45,54 @@ interface FormField {
   placeholder: string
 }
 
+const defaultSpeakers: Speaker[] = [
+  {
+    id: '1',
+    name: 'Đoàn Đức Minh',
+    title: 'Phó Trưởng khoa Du lịch - UEH',
+    image: '/doan-duc-minh.png',
+    bio: ' Phó Trưởng khoa Du lịch – Đại học Kinh tế TP. Hồ Chí Minh (UEH)\nThạc sĩ Quản trị Kinh doanh, nghiên cứu sinh Tiến sĩ Quản trị Kinh doanh\nGiảng viên Khoa Du lịch – Đại học Kinh tế TP. Hồ Chí Minh (UEH)\nNhiều năm kinh nghiệm làm việc tại các tập đoàn trong và ngoài nước (từ nhân viên đến lãnh đạo cấp cao)'
+  },
+  {
+    id: '2',
+    name: 'Phan Huỳnh Anh',
+    title: 'Tiến sĩ, Kinh tế',
+    image: '/phan-quynh-anh.png',
+    bio: 'Giảng viên tại UEH, nhà doanh nhân và mentor khởi nghiệp uy tín, với niềm đam mê sâu sắc trong giáo dục thực hành và mentoring doanh nghiệp\nĐồng sáng lập Quỹ FFVN\nThành lập Viện Smentor – mô hình đào tạo, mentoring cho startup & doanh nghiệp\nĐồng sáng lập Viện Việt Nam Bách Nghệ Thực Hành và các mô hình kinh doanh – công nghệ'
+  },
+  {
+    id: '3',
+    name: 'Phạm Hoàng Minh Khánh',
+    title: 'CEO Công ty cổ phần SMAR',
+    image: '/pham-hoang-minh-khanh.png',
+    bio: 'Sáng lập & Giám đốc Công ty TNHH Smentor (2017 – nay)\nSáng lập & Giám đốc Công ty cổ phần SMAR (2020 – nay)\nSáng lập & Giám đốc Công ty Phát triển Nông nghiệp Xanh SGA (2022 – nay)\nViện Phó – Viện Việt Nam Bách Nghệ Thực Hành (2021 – nay)\nGiảng viên – Đại học Kinh tế Tài chính TP.HCM (UEF) (2022 – nay)'
+  },
+  {
+    id: '4',
+    name: 'Đỗ Phan Nam Tiến',
+    title: 'Giám đốc, Trung tâm Phát triển Kỹ năng Tự sự',
+    image: '/do-phan-nam-tien.png',
+    bio: 'Có nhiều năm đảm nhiệm vị trí Giám đốc Pháp lý tại các doanh nghiệp trong nước và có vốn đầu tư nước ngoài, sở hữu nền tảng chuyên môn vững chắc trong lĩnh vực pháp lý doanh nghiệp, quản trị và kiểm soát nội bộ. Hiện nay, ông là Giám đốc Trung tâm Phát triển Kinh tế S17, đồng thời là chuyên gia uy tín có nhiều đóng góp tích cực cho Cộng đồng khởi nghiệp và đổi mới sáng tạo tại TP. Hồ Chí Minh. Với kinh nghiệm thực tiễn phong phú và tâm huyết trong việc phát triển hệ sinh thái khởi nghiệp, ông được biết đến là một trong những gương mặt tiêu biểu trong lĩnh vực quản trị và hỗ trợ doanh nghiệp đổi mới sáng tạo.'
+  },
+  {
+    id: '5',
+    name: 'Dương Thế Khải',
+    title: 'Chủ tịch Vietnam Student Marathon',
+    image: '/duong-the-khai.png',
+    bio: 'Chủ tịch Vietnam Student Marathon\n6 lần chinh phục cự ly Full Marathon (42,195 km)\nQuản lý dự án tại Công ty CP Tập đoàn Nam Quốc\nTrợ lý Giám đốc tại Công ty TNHH F FOUNDATION\nQuản lý dự án tại Công ty phát triển Nông Nghiệp Xanh SGA'
+  },
+  {
+    id: '6',
+    name: 'Nguyễn Trang',
+    title: 'MC/Host',
+    image: '/nguyen-trang.png',
+    bio: 'MC Nguyễn Trang là một gương mặt nổi bật, đã xuất sắc giành ngôi vị Tân quán quân Your Voice Our Voice 2025 và danh hiệu Miss MC duyên dáng. Không chỉ khẳng định tài năng trong lĩnh vực dẫn dắt, cô còn gặt hái thành công tại các cuộc thi nhan sắc với thành tích Á khôi Đại sứ Văn hóa ASEAN, lọt Top 10 Hoa Hậu Văn Hóa Hữu Nghị Quốc Tế và vinh dự nhận giải Người đẹp truyền cảm hứng, chứng minh cho sự duyên dáng, tài năng và khả năng lan tỏa những giá trị tích cực đến cộng đồng.'
+  },
+]
+
 export default function AdminDashboard() {
   const [registrations, setRegistrations] = useState<Registration[]>([])
-  const [speakers, setSpeakers] = useState<Speaker[]>([])
+  const [speakers, setSpeakers] = useState<Speaker[]>(defaultSpeakers) 
   const [sponsors, setSponsors] = useState<Sponsor[]>([])
   const [faqs, setFaqs] = useState<FAQ[]>([])
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -72,57 +117,6 @@ export default function AdminDashboard() {
       setRegistrations(JSON.parse(stored))
     }
 
-    const storedSpeakers = localStorage.getItem('seminar_speakers')
-    if (storedSpeakers) {
-      setSpeakers(JSON.parse(storedSpeakers))
-    } else {
-      const defaultSpeakers: Speaker[] = [
-        {
-          id: '1',
-          name: 'Đoàn Đức Minh',
-          title: 'Phó Trưởng khoa Du lịch - UEH',
-          image: '/doan-duc-minh.png',
-          bio: ' Phó Trưởng khoa Du lịch – Đại học Kinh tế TP. Hồ Chí Minh (UEH)\nThạc sĩ Quản trị Kinh doanh, nghiên cứu sinh Tiến sĩ Quản trị Kinh doanh\nGiảng viên Khoa Du lịch – Đại học Kinh tế TP. Hồ Chí Minh (UEH)\nNhiều năm kinh nghiệm làm việc tại các tập đoàn trong và ngoài nước (từ nhân viên đến lãnh đạo cấp cao)'
-        },
-        {
-          id: '2',
-          name: 'Phan Huỳnh Anh',
-          title: 'Tiến sĩ, Kinh tế',
-          image: '/phan-quynh-anh.png',
-          bio: 'Giảng viên tại UEH, nhà doanh nhân và mentor khởi nghiệp uy tín, với niềm đam mê sâu sắc trong giáo dục thực hành và mentoring doanh nghiệp\nĐồng sáng lập Quỹ FFVN\nThành lập Viện Smentor – mô hình đào tạo, mentoring cho startup & doanh nghiệp\nĐồng sáng lập Viện Việt Nam Bách Nghệ Thực Hành và các mô hình kinh doanh – công nghệ'
-        },
-        {
-          id: '3',
-          name: 'Phạm Hoàng Minh Khánh',
-          title: 'CEO Công ty cổ phần SMAR',
-          image: '/pham-hoang-minh-khanh.png',
-          bio: 'Sáng lập & Giám đốc Công ty TNHH Smentor (2017 – nay)\nSáng lập & Giám đốc Công ty cổ phần SMAR (2020 – nay)\nSáng lập & Giám đốc Công ty Phát triển Nông nghiệp Xanh SGA (2022 – nay)\nViện Phó – Viện Việt Nam Bách Nghệ Thực Hành (2021 – nay)\nGiảng viên – Đại học Kinh tế Tài chính TP.HCM (UEF) (2022 – nay)'
-        },
-        {
-          id: '4',
-          name: 'Đỗ Phan Nam Tiến',
-          title: 'Giám đốc, Trung tâm Phát triển Kỹ năng Tự sự',
-          image: '/do-phan-nam-tien.png',
-          bio: 'Có nhiều năm đảm nhiệm vị trí Giám đốc Pháp lý tại các doanh nghiệp trong nước và có vốn đầu tư nước ngoài, sở hữu nền tảng chuyên môn vững chắc trong lĩnh vực pháp lý doanh nghiệp, quản trị và kiểm soát nội bộ. Hiện nay, ông là Giám đốc Trung tâm Phát triển Kinh tế S17, đồng thời là chuyên gia uy tín có nhiều đóng góp tích cực cho Cộng đồng khởi nghiệp và đổi mới sáng tạo tại TP. Hồ Chí Minh. Với kinh nghiệm thực tiễn phong phú và tâm huyết trong việc phát triển hệ sinh thái khởi nghiệp, ông được biết đến là một trong những gương mặt tiêu biểu trong lĩnh vực quản trị và hỗ trợ doanh nghiệp đổi mới sáng tạo.'
-        },
-        {
-          id: '5',
-          name: 'Dương Thế Khải',
-          title: 'Chủ tịch Vietnam Student Marathon',
-          image: '/duong-the-khai.png',
-          bio: 'Chủ tịch Vietnam Student Marathon\n6 lần chinh phục cự ly Full Marathon (42,195 km)\nQuản lý dự án tại Công ty CP Tập đoàn Nam Quốc\nTrợ lý Giám đốc tại Công ty TNHH F FOUNDATION\nQuản lý dự án tại Công ty phát triển Nông Nghiệp Xanh SGA'
-        },
-        {
-          id: '6',
-          name: 'Nguyễn Trang',
-          title: 'MC/Host',
-          image: '/nguyen-trang.png',
-          bio: 'MC Nguyễn Trang là một gương mặt nổi bật, đã xuất sắc giành ngôi vị Tân quán quân Your Voice Our Voice 2025 và danh hiệu Miss MC duyên dáng. Không chỉ khẳng định tài năng trong lĩnh vực dẫn dắt, cô còn gặt hái thành công tại các cuộc thi nhan sắc với thành tích Á khôi Đại sứ Văn hóa ASEAN, lọt Top 10 Hoa Hậu Văn Hóa Hữu Nghị Quốc Tế và vinh dự nhận giải Người đẹp truyền cảm hứng, chứng minh cho sự duyên dáng, tài năng và khả năng lan tỏa những giá trị tích cực đến cộng đồng.'
-        },
-      ]
-      setSpeakers(defaultSpeakers)
-      localStorage.setItem('seminar_speakers', JSON.stringify(defaultSpeakers))
-    }
 
     const storedSponsors = localStorage.getItem('seminar_sponsors')
     if (storedSponsors) {
@@ -232,8 +226,7 @@ export default function AdminDashboard() {
   }
 
   const saveSpeakers = () => {
-    localStorage.setItem('seminar_speakers', JSON.stringify(speakers))
-    alert('Lưu diễn giả thành công!')
+    alert('Lưu diễn giả thành công! (Danh sách chỉ được cập nhật trong phiên hiện tại)')
   }
 
   const updateSpeaker = (updatedSpeaker: Speaker) => {
@@ -679,7 +672,7 @@ export default function AdminDashboard() {
                       <div>
                         <h3 className="font-semibold text-lg">{speaker.name}</h3>
                         <p className="text-sm text-accent mb-2">{speaker.title}</p>
-                        <p className="text-xs text-muted-foreground">{speaker.bio}</p>
+                        <p className="text-xs text-muted-foreground whitespace-pre-line">{speaker.bio}</p>
                       </div>
                       <div className="flex gap-2">
                         <Button onClick={() => setEditingSpeaker(speaker)} className="flex-1 bg-orange-500 hover:bg-orange-600">
