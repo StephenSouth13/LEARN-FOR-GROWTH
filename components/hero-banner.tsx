@@ -14,7 +14,7 @@ export default function HeroBanner() {
     <section className="relative w-full overflow-hidden pt-1">
       <div className="relative w-full aspect-video md:aspect-auto md:min-h-screen">
         <Image
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/BANNER-02-IKGWPZBdjlezN3kNhOOa7zhHxNaBtE.png"
+          src="/images/banner-02.png"
           alt="LEARN FOR GROWTH Seminar 2025"
           fill
           className="object-cover"
@@ -32,7 +32,7 @@ export default function HeroBanner() {
           <Button 
             onClick={() => scrollToElement('event')}
             variant="outline" 
-            className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg text-white border-2 border-white hover:bg-white/20 font-bold transition-all duration-300 backdrop-blur-sm rounded-lg"
+            className="mb-[25px] px-6 md:px-8 py-3 md:py-4 text-base md:text-lg text-white border-2 border-white hover:bg-white/20 font-bold transition-all duration-300 backdrop-blur-sm rounded-lg"
           >
             Xem chi tiết
           </Button>
