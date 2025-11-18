@@ -34,7 +34,7 @@ export default function EventDetails() {
         </div>
 
         <Card className="p-8 bg-gradient-to-r from-primary/5 dark:from-primary/10 to-accent/5 dark:to-accent/10 border-accent/20">
-          <h3 className="text-2xl font-bold mb-6">Giới thiệu sự kiện</h3>
+          <h3 className="text-2xl font-bold">Giới thiệu sự kiện</h3>
           <div className="space-y-4 text-muted-foreground">
             <p>
               Sự kiện "LEARN FOR GROWTH - KỸ NĂNG LÀM VIỆC CHUYÊN NGHIỆP TRONG MÔI TRƯỜNG DOANH NGHIỆP" 
