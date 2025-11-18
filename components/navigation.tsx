@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { useLanguage } from '@/lib/language-context'
 import { translations } from '@/lib/i18n'
 import { LanguageSwitcher } from './language-switcher'
+import Image from 'next/image'
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
@@ -61,33 +62,36 @@ export default function Navigation() {
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <span className="text-white font-bold text-sm">LFG</span>
-              </div>
-              <span className="font-bold text-lg text-foreground">LEARN FOR GROWTH</span>
+                <Image
+                  src="/logo-07.png"
+                  alt="LEARN FOR GROWTH logo"
+                  width={100}
+                  height={100}
+                  className="object-cover"
+                />
             </div>
 
             <div className="hidden md:flex gap-8">
-              <a 
-                href="#event" 
+              <a
+                href="#event"
                 className={`transition font-medium ${isActive('event') ? 'text-accent' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 {t.nav.event}
               </a>
-              <a 
-                href="#speakers" 
+              <a
+                href="#speakers"
                 className={`transition font-medium ${isActive('speakers') ? 'text-accent' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 {t.nav.speakers}
               </a>
-              <a 
-                href="#register" 
+              <a
+                href="#register"
                 className={`transition font-medium ${isActive('register') ? 'text-accent' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 {t.nav.register}
               </a>
-              <a 
-                href="#faq" 
+              <a
+                href="#faq"
                 className={`transition font-medium ${isActive('faq') ? 'text-accent' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 {t.nav.faq}
@@ -137,8 +141,8 @@ export default function Navigation() {
               </a>
               <div className="flex gap-2 pt-2">
                 <LanguageSwitcher />
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="icon"
                   onClick={toggleDarkMode}
                 >

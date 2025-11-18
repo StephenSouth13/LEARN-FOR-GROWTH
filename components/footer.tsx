@@ -1,6 +1,7 @@
 'use client'
 
 import { Mail, Phone, MapPin, Github, Linkedin, Facebook } from 'lucide-react'
+import Image from 'next/image'
 
 export default function Footer() {
   return (
@@ -9,10 +10,13 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <span className="text-white font-bold text-sm">LFG</span>
-              </div>
-              <span className="font-bold text-foreground">LEARN FOR GROWTH</span>
+              <Image
+                src="/logo-07.png"
+                alt="LEARN FOR GROWTH logo"
+                width={100}
+                height={100}
+                className="object-cover"
+              />
             </div>
             <p className="text-sm text-muted-foreground">
               Phát triển kỹ năng chuyên nghiệp cho thế hệ lãnh đạo tương lai.
