@@ -32,7 +32,7 @@ export default function Speakers() {
         {
           id: '2',
           name: 'Phan Huỳnh Anh',
-          title: 'Tiến sĩ, Kinh tế',
+          title: 'Chủ tịch HĐQT Công ty Smentor',
           image: '/phan-quynh-anh.png',
           bio: 'Giảng viên tại UEH, nhà doanh nhân và mentor khởi nghiệp uy tín, với niềm đam mê sâu sắc trong giáo dục thực hành và mentoring doanh nghiệp\nĐồng sáng lập Quỹ FFVN\nThành lập Viện Smentor – mô hình đào tạo, mentoring cho startup & doanh nghiệp\nĐồng sáng lập Viện Việt Nam Bách Nghệ Thực Hành và các mô hình kinh doanh – công nghệ'
         },
@@ -46,7 +46,7 @@ export default function Speakers() {
         {
           id: '4',
           name: 'Đỗ Phan Nam Tiến',
-          title: 'Giám đốc, Trung tâm Phát triển Kỹ năng Tự sự',
+          title: 'Giám đốc Trung tâm Phát triển Kinh tế S17',
           image: '/do-phan-nam-tien.png',
           bio: 'Có nhiều năm đảm nhiệm vị trí Giám đốc Pháp lý tại các doanh nghiệp trong nước và có vốn đầu tư nước ngoài, sở hữu nền tảng chuyên môn vững chắc trong lĩnh vực pháp lý doanh nghiệp, quản trị và kiểm soát nội bộ. Hiện nay, ông là Giám đốc Trung tâm Phát triển Kinh tế S17, đồng thời là chuyên gia uy tín có nhiều đóng góp tích cực cho Cộng đồng khởi nghiệp và đổi mới sáng tạo tại TP. Hồ Chí Minh. Với kinh nghiệm thực tiễn phong phú và tâm huyết trong việc phát triển hệ sinh thái khởi nghiệp, ông được biết đến là một trong những gương mặt tiêu biểu trong lĩnh vực quản trị và hỗ trợ doanh nghiệp đổi mới sáng tạo.'
         },

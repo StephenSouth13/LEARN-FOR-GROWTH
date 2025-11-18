@@ -22,7 +22,7 @@ export default function HeroBanner() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
 
-        <div className="absolute bottom-8 md:bottom-12 left-4 sm:left-8 lg:left-16 flex flex-col sm:flex-row gap-3">
+        {/* <div className="absolute bottom-8 md:bottom-12 left-4 sm:left-8 lg:left-16 flex flex-col sm:flex-row gap-3">
           <Button 
             onClick={() => scrollToElement('register')}
             className="bg-orange-500 hover:bg-orange-600 text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 rounded-lg"
@@ -36,7 +36,7 @@ export default function HeroBanner() {
           >
             Xem chi tiết
           </Button>
-        </div>
+        </div> */}
 
         <div className="absolute bottom-6 md:bottom-8 right-6 md:right-8 animate-bounce">
           <ChevronDown className="text-white" size={28} />
