@@ -20,7 +20,7 @@ interface Setting {
 
 export default async function Home() {
     // 1. Dùng hàm createClient() mới để có client Server Component an toàn
-    const supabase = createClient(); 
+    const supabase = await createClient(); 
 
     // Tìm nạp tất cả dữ liệu song song để tối ưu tốc độ
     const [speakersRes, faqsRes, settingsRes, sponsorsRes] = await Promise.all([

@@ -1,5 +1,3 @@
-// lib/supabase-server.ts
-
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -10,8 +8,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Supabase URL and Anon Key are required for server client.')
 }
 
-export function createClient() {
-  const cookieStore = cookies()
+export async function createClient() {
+  const cookieStore = await cookies()
 
   return createServerClient(supabaseUrl!, supabaseAnonKey!, {
     cookies: {
@@ -22,14 +20,14 @@ export function createClient() {
         try {
           cookieStore.set(name, value, options)
         } catch (error) {
-          // Thao tác thất bại nếu gọi trong Server Component
+          // Cookie operation may fail in Server Components
         }
       },
       remove(name: string, options: CookieOptions) {
         try {
           cookieStore.set(name, '', options)
         } catch (error) {
-          // Xóa cookies thất bại nếu gọi trong Server Component
+          // Cookie removal may fail in Server Components
         }
       },
     },
