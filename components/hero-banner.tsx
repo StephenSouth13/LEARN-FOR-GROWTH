@@ -4,7 +4,11 @@ import { Button } from '@/components/ui/button'
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 
-export default function HeroBanner() {
+interface HeroBannerProps {
+  bannerImageUrl: string;
+}
+
+export default function HeroBanner({ bannerImageUrl }: HeroBannerProps) {
   const scrollToElement = (id: string) => {
     const element = document.getElementById(id)
     element?.scrollIntoView({ behavior: 'smooth' })
@@ -14,11 +18,14 @@ export default function HeroBanner() {
     <section className="relative w-full overflow-hidden pt-1">
       <div className="relative w-full aspect-video md:aspect-auto md:min-h-screen">
         <Image
-          src="/images/banner-02.png"
+          src={bannerImageUrl}
           alt="LEARN FOR GROWTH Seminar 2025"
           fill
           className="object-cover"
           priority
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/images/banner-02.png'; // Fallback image
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
 

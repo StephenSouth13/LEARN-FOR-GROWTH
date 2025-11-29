@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import {
   Accordion,
   AccordionContent,
@@ -8,22 +7,17 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 
-interface FAQ {
+interface FAQItem {
   id: string
   question: string
   answer: string
 }
 
-export default function FAQ() {
-  const [faqs, setFaqs] = useState<FAQ[]>([])
+interface FAQProps {
+  faqs: FAQItem[];
+}
 
-  useEffect(() => {
-    const stored = localStorage.getItem('seminar_faqs')
-    if (stored) {
-      setFaqs(JSON.parse(stored))
-    }
-  }, [])
-
+export default function FAQ({ faqs }: FAQProps) {
   return (
     <section id="faq" className="py-20 bg-background dark:bg-slate-950">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -41,7 +35,7 @@ export default function FAQ() {
               value={faq.id}
               className="border border-accent/10 dark:border-accent/20 rounded-lg px-6 hover:border-accent/30 transition bg-card dark:bg-slate-900"
             >
-              <AccordionTrigger className="hover:text-accent font-semibold">
+              <AccordionTrigger className="hover:text-accent font-semibold text-left">
                 {faq.question}
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
