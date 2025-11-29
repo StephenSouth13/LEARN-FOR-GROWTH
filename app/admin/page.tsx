@@ -14,408 +14,443 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 
-// --- Interface Definitions (Đã thêm Index Signature để fix lỗi truy cập dữ liệu động) ---
 interface Registration {
-  id: string
-  full_name: string
-  email: string
-  phone: string 
-  organization: string 
-  registered_at: string 
-  fullName: string 
-  registeredAt: string 
-  [key: string]: any // Cho phép truy cập động (ví dụ: r[f.name])
+  id: string
+  full_name: string
+  email: string
+  phone: string 
+  organization: string 
+  registered_at: string 
+  fullName: string 
+  registeredAt: string 
+  [key: string]: any
 }
 
 interface Speaker {
-  id: string
-  name: string
-  title: string
-  bio: string
-  image_url: string // Tên cột DB
+  id: string
+  name: string
+  title: string
+  bio: string
+  image_url: string
 }
 
 interface Sponsor {
-  id: string
-  name: string
-  type: string
-  logo_url: string // Tên cột DB
-  website: string 
+  id: string
+  name: string
+  type: string
+  logo_url: string
+  website: string 
 }
 
 interface FAQ {
-  id: string
-  question: string
-  answer: string
+  id: string
+  question: string
+  answer: string
 }
 
 interface FormField {
-  id: string
-  name: string
-  label: string
-  type: 'text' | 'email' | 'tel' | 'number'
-  required: boolean
-  placeholder: string
+  id: string
+  name: string
+  label: string
+  type: 'text' | 'email' | 'tel' | 'number'
+  required: boolean
+  placeholder: string
 }
 
-type EditableItem = Speaker | Sponsor | FAQ | FormField;
-type ItemType = 'speaker' | 'sponsor' | 'faq' | 'field';
+type EditableItem = Speaker | Sponsor | FAQ | FormField
+type ItemType = 'speaker' | 'sponsor' | 'faq' | 'field'
 
-// --- Main Admin Dashboard Component ---
 export default function AdminDashboard() {
-  // --- State Management ---
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
-  const [registrations, setRegistrations] = useState<Registration[]>([])
-  const [speakers, setSpeakers] = useState<Speaker[]>([])
-  const [sponsors, setSponsors] = useState<Sponsor[]>([])
-  const [faqs, setFaqs] = useState<FAQ[]>([])
-  const [formFields, setFormFields] = useState<FormField[]>([])
-  const [bannerImageUrl, setBannerImageUrl] = useState('')
+  const [registrations, setRegistrations] = useState<Registration[]>([])
+  const [speakers, setSpeakers] = useState<Speaker[]>([])
+  const [sponsors, setSponsors] = useState<Sponsor[]>([])
+  const [faqs, setFaqs] = useState<FAQ[]>([])
+  const [formFields, setFormFields] = useState<FormField[]>([])
+  const [bannerImageUrl, setBannerImageUrl] = useState('')
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingItem, setEditingItem] = useState<EditableItem | null>(null)
-  const [editingType, setEditingType] = useState<ItemType | null>(null)
-  const [fileToUpload, setFileToUpload] = useState<File | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingItem, setEditingItem] = useState<EditableItem | null>(null)
+  const [editingType, setEditingType] = useState<ItemType | null>(null)
+  const [fileToUpload, setFileToUpload] = useState<File | null>(null)
 
-  // --- Data Fetching ---
-  const fetchData = useCallback(async () => {
-    setLoading(true)
+  const fetchData = useCallback(async () => {
+    setLoading(true)
     
-    const [speakersRes, sponsorsRes, faqsRes, registrationsRes, settingsRes] = await Promise.all([
-      supabase.from('speakers').select('id, name, title, bio, image_url').order('created_at'),
-      supabase.from('sponsors').select('id, name, type, logo_url, website').order('created_at'),
-      supabase.from('faqs').select('*').order('created_at'),
-      supabase.from('registrations').select('id, full_name, email, phone, organization, registered_at').order('registered_at', { ascending: false }),
-      supabase.from('settings').select('key, value')
-    ])
+    try {
+      const [speakersRes, sponsorsRes, faqsRes, registrationsRes, settingsRes] = await Promise.all([
+        supabase.from('speakers').select('id, name, title, bio, image_url').order('created_at'),
+        supabase.from('sponsors').select('id, name, type, logo_url, website').order('created_at'),
+        supabase.from('faqs').select('*').order('created_at'),
+        supabase.from('registrations').select('id, full_name, email, phone, organization, registered_at').order('registered_at', { ascending: false }),
+        supabase.from('settings').select('key, value')
+      ])
 
-    if (speakersRes.data) setSpeakers(speakersRes.data as Speaker[])
-    if (sponsorsRes.data) setSponsors(sponsorsRes.data as Sponsor[])
-    if (faqsRes.data) setFaqs(faqsRes.data as FAQ[])
-    
-    if (registrationsRes.data) {
-        const formattedRegistrations = registrationsRes.data.map((r: any) => ({
-            ...r,
-            fullName: r.full_name || '',
-            organization: r.organization || r.company || '', 
-            registeredAt: new Date(r.registered_at).toLocaleString('vi-VN')
-        }))
-        setRegistrations(formattedRegistrations as Registration[])
-    }
-    
-    if (settingsRes.data) {
-      const bannerSetting = settingsRes.data.find(s => s.key === 'banner_image_url') 
-      if (bannerSetting) setBannerImageUrl(bannerSetting.value)
+      if (speakersRes.data) setSpeakers(speakersRes.data as Speaker[])
+      if (sponsorsRes.data) setSponsors(sponsorsRes.data as Sponsor[])
+      if (faqsRes.data) setFaqs(faqsRes.data as FAQ[])
+      
+      if (registrationsRes.data) {
+          const formattedRegistrations = registrationsRes.data.map((r: any) => ({
+              ...r,
+              fullName: r.full_name || '',
+              organization: r.organization || '', 
+              registeredAt: r.registered_at ? new Date(r.registered_at).toLocaleString('vi-VN') : new Date().toLocaleString('vi-VN')
+          }))
+          setRegistrations(formattedRegistrations as Registration[])
+      }
+      
+      if (settingsRes.data) {
+        const bannerSetting = settingsRes.data.find((s: any) => s.key === 'banner_image_url') 
+        if (bannerSetting) setBannerImageUrl(bannerSetting.value || '')
 
-      const formFieldsSetting = settingsRes.data.find(s => s.key === 'form_fields') 
-      if (formFieldsSetting?.value) {
-        try {
-          setFormFields(JSON.parse(formFieldsSetting.value) as FormField[])
-        } catch (e) {
-          console.error("Error parsing form fields:", e)
-          setFormFields([])
-        }
-      }
-    }
-    setLoading(false)
-  }, [])
+        const formFieldsSetting = settingsRes.data.find((s: any) => s.key === 'form_fields') 
+        if (formFieldsSetting?.value) {
+          try {
+            const parsed = typeof formFieldsSetting.value === 'string' ? JSON.parse(formFieldsSetting.value) : formFieldsSetting.value
+            setFormFields(Array.isArray(parsed) ? parsed : [])
+          } catch (e) {
+            console.error("Error parsing form fields:", e)
+            setFormFields([])
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Fetch data error:', err)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-  // --- Effects ---
-  useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
-      setLoading(false)
-    }
-    getSession()
+  useEffect(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      setUser(session?.user ?? null)
+      setLoading(false)
+    }
+    getSession()
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null)
-        setLoading(false)
-      }
-    )
-    return () => authListener?.subscription.unsubscribe()
-  }, [])
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null)
+        setLoading(false)
+      }
+    )
+    return () => authListener?.subscription.unsubscribe()
+  }, [])
 
-  useEffect(() => {
-    if (user) {
-      fetchData()
-    }
-  }, [user, fetchData])
+  useEffect(() => {
+    if (user) {
+      fetchData()
+    }
+  }, [user, fetchData])
 
-  // --- Modal & Form Handlers ---
-  const openModal = (item: EditableItem | 'new', type: ItemType) => {
-    setEditingType(type)
-    setFileToUpload(null)
+  const openModal = (item: EditableItem | 'new', type: ItemType) => {
+    setEditingType(type)
+    setFileToUpload(null)
 
-    if (item === 'new') {
-      let defaultItem: any = { id: `new-${Date.now()}` }
-      if (type === 'speaker') defaultItem = { ...defaultItem, name: '', title: '', image_url: '', bio: '' }
-      if (type === 'sponsor') defaultItem = { ...defaultItem, name: '', type: '', logo_url: '', website: '' }
-      if (type === 'faq') defaultItem = { ...defaultItem, question: '', answer: '' }
-      if (type === 'field') defaultItem = { ...defaultItem, name: `field_${Date.now()}`, label: 'Trường mới', type: 'text', required: false, placeholder: '' }
-      setEditingItem(defaultItem)
-    } else {
-      setEditingItem(item)
-    }
-    setIsModalOpen(true)
-  }
+    if (item === 'new') {
+      let defaultItem: any = { id: `new-${Date.now()}` }
+      if (type === 'speaker') defaultItem = { ...defaultItem, name: '', title: '', image_url: '', bio: '' }
+      if (type === 'sponsor') defaultItem = { ...defaultItem, name: '', type: '', logo_url: '', website: '' }
+      if (type === 'faq') defaultItem = { ...defaultItem, question: '', answer: '' }
+      if (type === 'field') defaultItem = { ...defaultItem, name: `field_${Date.now()}`, label: 'Trường mới', type: 'text', required: false, placeholder: '' }
+      setEditingItem(defaultItem)
+    } else {
+      setEditingItem(item)
+    }
+    setIsModalOpen(true)
+  }
 
-  const closeModal = () => {
-    setIsModalOpen(false)
-    setEditingItem(null)
-    setEditingType(null)
-    setFileToUpload(null)
-  }
+  const closeModal = () => {
+    setIsModalOpen(false)
+    setEditingItem(null)
+    setEditingType(null)
+    setFileToUpload(null)
+  }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    if (!editingItem) return
-    const { name, value } = e.target
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    if (!editingItem) return
+    const { name, value } = e.target
     
     if (editingType === 'field' && name === 'label') {
-        const fieldName = value.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').substring(0, 30);
+        const fieldName = value.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').substring(0, 30)
         setEditingItem({ ...editingItem, name: fieldName, [name]: value } as FormField)
-        return;
+        return
     }
     
-    setEditingItem({ ...editingItem, [name]: value })
-  }
+    setEditingItem({ ...editingItem, [name]: value })
+  }
     
-  const handleCheckboxChange = (name: string, checked: boolean) => {
+  const handleCheckboxChange = (name: string, checked: boolean) => {
     if (!editingItem) return
     setEditingItem({ ...editingItem, [name]: checked })
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFileToUpload(e.target.files[0])
-    }
-  }
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFileToUpload(e.target.files[0])
+    }
+  }
 
-  // --- CRUD Handlers ---
-  const handleSave = async () => {
-    if (!editingItem || !editingType) return
+  const handleSave = async () => {
+    if (!editingItem || !editingType) return
     
-    if (editingType === 'field') {
-      await handleFormFieldSave()
-      return
-    }
+    if (editingType === 'field') {
+      await handleFormFieldSave()
+      return
+    }
     
     setLoading(true)
-    let itemToSave = { ...editingItem } as any;
+    let itemToSave = { ...editingItem } as any
 
-    // 1. Upload Image nếu có file
-    if (fileToUpload) {
-      const filePath = `public/${editingType}/${Date.now()}-${fileToUpload.name}`
-      const { error: uploadError } = await supabase.storage.from('images').upload(filePath, fileToUpload)
-      if (uploadError) {
-        alert(`Lỗi tải ảnh lên: ${uploadError.message}`)
-        setLoading(false); return
-      }
-      const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(filePath)
-      if (editingType === 'speaker') itemToSave.image_url = publicUrl
-      if (editingType === 'sponsor') itemToSave.logo_url = publicUrl
-    }
+    try {
+      if (fileToUpload) {
+        const filePath = `public/${editingType}/${Date.now()}-${fileToUpload.name}`
+        const { error: uploadError } = await supabase.storage.from('images').upload(filePath, fileToUpload)
+        if (uploadError) {
+          alert(`Lỗi tải ảnh lên: ${uploadError.message}`)
+          return
+        }
+        const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(filePath)
+        if (editingType === 'speaker') itemToSave.image_url = publicUrl
+        if (editingType === 'sponsor') itemToSave.logo_url = publicUrl
+      }
 
-    // 2. Chuẩn bị cho DB
-    const { id, ...dbItem } = itemToSave
-    const table = `${editingType}s`
+      const { id, ...dbItem } = itemToSave
+      const table = `${editingType}s`
+      const isNew = id.startsWith('new-')
+      let error: any = null
 
-    // 3. Thực hiện Save/Update
-    const isNew = id.startsWith('new-');
-    let error: any = null;
+      if (isNew) {
+        ({ error } = await supabase.from(table).insert([dbItem]))
+      } else {
+        ({ error } = await supabase.from(table).update(dbItem).eq('id', id))
+      }
 
-    if (isNew) {
-      ({ error } = await supabase.from(table).insert([dbItem]));
-    } else {
-      ({ error } = await supabase.from(table).update(dbItem).eq('id', id));
+      if (error) {
+        alert(`Lỗi ${isNew ? 'tạo mới' : 'cập nhật'}: ${error.message}`)
+      } else {
+        await fetchData()
+        closeModal()
+        alert(`Lưu ${editingType} thành công!`)
+      }
+    } catch (err) {
+      console.error('Save error:', err)
+      alert(`Lỗi: ${err instanceof Error ? err.message : 'Không xác định'}`)
+    } finally {
+      setLoading(false)
     }
+  }
 
-    if (error) {
-      alert(`Lỗi ${isNew ? 'tạo mới' : 'cập nhật'}: ${error.message}`);
-    } else {
-      // FIX LỖI LƯU (UX): Sau khi lưu thành công, fetch lại dữ liệu và đóng modal
-      await fetchData(); 
-      closeModal();
-      alert(`Lưu ${editingType} thành công!`);
+  const handleDelete = async (id: string, type: ItemType) => {
+    if (!confirm('Bạn chắc chắn muốn xóa mục này?')) return
+    
+    if (type === 'field') {
+      await handleFormFieldDelete(id)
+      return
     }
-
-    setLoading(false);
-  }
-
-  const handleDelete = async (id: string, type: ItemType) => {
-    if (!confirm('Bạn chắc chắn muốn xóa mục này?')) return
-    
-    if (type === 'field') {
-      await handleFormFieldDelete(id)
-      return
-    }
     
     setLoading(true)
-    const { error } = await supabase.from(`${type}s`).delete().eq('id', id)
-    if (error) {
-      alert(`Lỗi xóa: ${error.message}`)
-    } else {
-      await fetchData()
-    }
-    setLoading(false)
-  }
+    try {
+      const { error } = await supabase.from(`${type}s`).delete().eq('id', id)
+      if (error) {
+        alert(`Lỗi xóa: ${error.message}`)
+      } else {
+        await fetchData()
+        alert(`Xóa ${type} thành công!`)
+      }
+    } catch (err) {
+      console.error('Delete error:', err)
+      alert(`Lỗi: ${err instanceof Error ? err.message : 'Không xác định'}`)
+    } finally {
+      setLoading(false)
+    }
+  }
     
-  // --- Specific Handlers ---
-  const handleFormFieldSave = async () => {
-    if (!editingItem) return
-    const field = editingItem as FormField
+  const handleFormFieldSave = async () => {
+    if (!editingItem) return
+    const field = editingItem as FormField
     
     if (!field.name || field.name.includes(' ')) {
-        alert("Tên trường (Field Name) không được để trống và không được chứa khoảng trắng.");
-        return;
+        alert("Tên trường (Field Name) không được để trống và không được chứa khoảng trắng.")
+        return
     }
     
-    const updatedFields = field.id.startsWith('new-')
-      ? [...formFields, { ...field, id: `field-${Date.now()}` }]
-      : formFields.map(f => f.id === field.id ? field : f)
+    const updatedFields = field.id.startsWith('new-')
+      ? [...formFields, { ...field, id: `field-${Date.now()}` }]
+      : formFields.map(f => f.id === field.id ? field : f)
       
     setLoading(true)
-    const { error } = await supabase.from('settings').upsert({ key: 'form_fields', value: JSON.stringify(updatedFields) }, { onConflict: 'key' })
-    
-    if (error) alert(`Lỗi lưu cấu hình Form: ${error.message}`)
-    else {
-      setFormFields(updatedFields)
-      closeModal()
-    }
-    setLoading(false)
-  }
+    try {
+      const { error } = await supabase.from('settings').upsert({ key: 'form_fields', value: JSON.stringify(updatedFields) }, { onConflict: 'key' })
+      
+      if (error) alert(`Lỗi lưu cấu hình Form: ${error.message}`)
+      else {
+        setFormFields(updatedFields)
+        closeModal()
+        alert('Lưu trường Form thành công!')
+      }
+    } catch (err) {
+      console.error('Form field save error:', err)
+      alert(`Lỗi: ${err instanceof Error ? err.message : 'Không xác định'}`)
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const handleFormFieldDelete = async (id: string) => {
-    if (!confirm('Bạn chắc chắn muốn xóa trường này?')) return;
-    const updatedFields = formFields.filter(f => f.id !== id)
+  const handleFormFieldDelete = async (id: string) => {
+    if (!confirm('Bạn chắc chắn muốn xóa trường này?')) return
+    const updatedFields = formFields.filter(f => f.id !== id)
     setLoading(true)
-    const { error } = await supabase.from('settings').upsert({ key: 'form_fields', value: JSON.stringify(updatedFields) }, { onConflict: 'key' })
-    if (error) alert(`Lỗi xóa trường Form: ${error.message}`)
-    else setFormFields(updatedFields)
-    setLoading(false)
-  }
+    try {
+      const { error } = await supabase.from('settings').upsert({ key: 'form_fields', value: JSON.stringify(updatedFields) }, { onConflict: 'key' })
+      if (error) alert(`Lỗi xóa trường Form: ${error.message}`)
+      else {
+        setFormFields(updatedFields)
+        alert('Xóa trường Form thành công!')
+      }
+    } catch (err) {
+      console.error('Form field delete error:', err)
+      alert(`Lỗi: ${err instanceof Error ? err.message : 'Không xác định'}`)
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const handleBannerImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  const handleBannerImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
 
-    setLoading(true)
-    const filePath = `public/banner/${Date.now()}-${file.name}`
-    const { error: uploadError } = await supabase.storage.from('images').upload(filePath, file)
-    if (uploadError) {
-      alert(`Lỗi tải ảnh banner lên: ${uploadError.message}`)
-      setLoading(false); return
-    }
+    setLoading(true)
+    try {
+      const filePath = `public/banner/${Date.now()}-${file.name}`
+      const { error: uploadError } = await supabase.storage.from('images').upload(filePath, file)
+      if (uploadError) {
+        alert(`Lỗi tải ảnh banner lên: ${uploadError.message}`)
+        return
+      }
 
-    const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(filePath)
-    await supabase.from('settings').upsert({ key: 'banner_image_url', value: publicUrl }, { onConflict: 'key' })
-    setBannerImageUrl(publicUrl)
-    alert('Cập nhật ảnh banner thành công!')
-    setLoading(false)
-  }
+      const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(filePath)
+      const { error: settingsError } = await supabase.from('settings').upsert({ key: 'banner_image_url', value: publicUrl }, { onConflict: 'key' })
+      
+      if (settingsError) {
+        alert(`Lỗi lưu URL banner: ${settingsError.message}`)
+      } else {
+        setBannerImageUrl(publicUrl)
+        alert('Cập nhật ảnh banner thành công!')
+      }
+    } catch (err) {
+      console.error('Banner upload error:', err)
+      alert(`Lỗi: ${err instanceof Error ? err.message : 'Không xác định'}`)
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const downloadRegistrations = () => {
-    const headers = formFields.length > 0 ? formFields.map(f => f.label) : ['Họ và tên', 'Email', 'Số điện thoại', 'Tổ chức'];
-    const keys = formFields.length > 0 ? formFields.map(f => f.name) : ['fullName', 'email', 'phone', 'organization'];
-    
-    const csv = [
-      ['\ufeff', ...headers, 'Thời gian ĐK'], 
-      ...registrations.map(r => [
-          '', 
-        ...keys.map(key => r[key] || r[key.toLowerCase()] || ''), 
-        r.registeredAt
-      ])
-    ]
-    
-    const csvContent = csv.map(row => row.map(cell => `"${(cell || '-').toString().replace(/"/g, '""')}"`).join(',')).join('\n')
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.setAttribute('href', url)
-    link.setAttribute('download', `danh_sach_dang_ky_${new Date().toISOString().slice(0, 10)}.csv`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
+  const downloadRegistrations = () => {
+    const headers = formFields.length > 0 ? formFields.map(f => f.label) : ['Họ và tên', 'Email', 'Số điện thoại', 'Tổ chức']
+    const keys = formFields.length > 0 ? formFields.map(f => f.name) : ['fullName', 'email', 'phone', 'organization']
+    
+    const csv = [
+      ['\ufeff', ...headers, 'Thời gian ĐK'], 
+      ...registrations.map(r => [
+          '', 
+        ...keys.map(key => {
+          const value = r[key] ?? r[key.toLowerCase()] ?? ''
+          return value
+        }), 
+        r.registeredAt
+      ])
+    ]
+    
+    const csvContent = csv.map(row => row.map(cell => `"${(cell || '-').toString().replace(/"/g, '""')}"`).join(',')).join('\n')
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('download', `danh_sach_dang_ky_${new Date().toISOString().slice(0, 10)}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
-  // --- Authentication ---
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) alert(`Đăng nhập thất bại: ${error.message}`)
-  }
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) alert(`Đăng nhập thất bại: ${error.message}`)
+    } catch (err) {
+      console.error('Login error:', err)
+      alert(`Lỗi: ${err instanceof Error ? err.message : 'Không xác định'}`)
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    setUser(null)
-  }
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    setUser(null)
+  }
 
-  // Analytics helper
   const registrationsToday = useMemo(() => {
-    const today = new Date().toDateString();
-    return registrations.filter(r => new Date(r.registered_at).toDateString() === today).length;
-  }, [registrations]);
+    const today = new Date().toDateString()
+    return registrations.filter(r => new Date(r.registered_at).toDateString() === today).length
+  }, [registrations])
 
+  if (loading) {
+    return <div className="flex h-screen items-center justify-center text-xl font-semibold dark:bg-gray-950 dark:text-white">Đang tải dữ liệu...</div>
+  }
 
-  // --- Render Logic ---
-  if (loading) {
-    return <div className="flex h-screen items-center justify-center text-xl font-semibold dark:bg-gray-950 dark:text-white">Đang tải dữ liệu...</div>
-  }
+  if (!user) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-100 dark:bg-gray-950">
+        <Card className="w-full max-w-sm p-8 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+          <h1 className="text-2xl font-bold text-center mb-6 text-blue-400">Admin Panel 🔒</h1>
+          <form onSubmit={handleLogin} className='space-y-4'>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" placeholder="admin@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="dark:bg-gray-700 dark:border-gray-600" required />
+            </div>
+            <div>
+              <Label htmlFor="password">Mật khẩu</Label>
+              <Input id="password" type="password" placeholder="********" value={password} onChange={(e) => setPassword(e.target.value)} className="dark:bg-gray-700 dark:border-gray-600" required />
+            </div>
+            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
+              Đăng nhập
+            </Button>
+          </form>
+        </Card>
+      </div>
+    )
+  }
 
-  if (!user) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-100 dark:bg-gray-950">
-        <Card className="w-full max-w-sm p-8 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-          <h1 className="text-2xl font-bold text-center mb-6 text-blue-400">Admin Panel 🔒</h1>
-          <form onSubmit={handleLogin} className='space-y-4'>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="admin@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="dark:bg-gray-700 dark:border-gray-600" required />
-            </div>
-            <div>
-              <Label htmlFor="password">Mật khẩu</Label>
-              <Input id="password" type="password" placeholder="********" value={password} onChange={(e) => setPassword(e.target.value)} className="dark:bg-gray-700 dark:border-gray-600" required />
-            </div>
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
-              Đăng nhập
-            </Button>
-          </form>
-        </Card>
-      </div>
-    )
-  }
+  return (
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 sm:p-6 lg:p-8">
+      <header className="flex justify-between items-center mb-6 pb-3 border-b border-gray-700">
+        <h1 className="text-3xl font-extrabold text-blue-400 flex items-center gap-2">Admin Dashboard <Settings className='w-5 h-5'/></h1>
+        <Button onClick={handleLogout} variant="outline" className="bg-gray-700 hover:bg-gray-600 border-gray-600 text-gray-100">
+          <LogOut className="mr-2 h-4 w-4" /> Đăng xuất
+        </Button>
+      </header>
 
-  return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 sm:p-6 lg:p-8">
-      {/* HEADER */}
-      <header className="flex justify-between items-center mb-6 pb-3 border-b border-gray-700">
-        <h1 className="text-3xl font-extrabold text-blue-400 flex items-center gap-2">Admin Dashboard <Settings className='w-5 h-5'/></h1>
-        <Button onClick={handleLogout} variant="outline" className="bg-gray-700 hover:bg-gray-600 border-gray-600 text-gray-100">
-          <LogOut className="mr-2 h-4 w-4" /> Đăng xuất
-        </Button>
-      </header>
+      <Tabs defaultValue="registrations">
+        <TabsList className="flex flex-wrap h-auto mb-6 bg-gray-800 p-1 rounded-xl shadow-lg border border-gray-700/50">
+          <TabsTrigger value="registrations" className='flex-1 gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg hover:bg-gray-700 transition'><Users className="h-4 w-4" />Đăng ký</TabsTrigger>
+          <TabsTrigger value="analytics" className='flex-1 gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg hover:bg-gray-700 transition'><BarChart3 className="h-4 w-4" />Thống kê</TabsTrigger>
+          <TabsTrigger value="speakers" className='flex-1 gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg hover:bg-gray-700 transition'><Users className="h-4 w-4" />Diễn giả</TabsTrigger>
+          <TabsTrigger value="sponsors" className='flex-1 gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg hover:bg-gray-700 transition'><ImageIcon className="h-4 w-4" />Hỗ trợ</TabsTrigger>
+          <TabsTrigger value="faqs" className='flex-1 gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg hover:bg-gray-700 transition'><FileText className="h-4 w-4" />FAQ</TabsTrigger>
+          <TabsTrigger value="content" className='flex-1 gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg hover:bg-gray-700 transition'><Settings className="h-4 w-4" />Ảnh bìa</TabsTrigger>
+          <TabsTrigger value="form" className='flex-1 gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg hover:bg-gray-700 transition'><Settings className="h-4 w-4" />Form ĐK</TabsTrigger>
+        </TabsList>
 
-      {/* TABS NAVIGATION */}
-      <Tabs defaultValue="registrations">
-        <TabsList className="flex flex-wrap h-auto mb-6 bg-gray-800 p-1 rounded-xl shadow-lg border border-gray-700/50">
-          <TabsTrigger value="registrations" className='flex-1 gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg hover:bg-gray-700 transition'><Users className="h-4 w-4" />Đăng ký</TabsTrigger>
-          <TabsTrigger value="analytics" className='flex-1 gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg hover:bg-gray-700 transition'><BarChart3 className="h-4 w-4" />Thống kê</TabsTrigger>
-          <TabsTrigger value="speakers" className='flex-1 gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg hover:bg-gray-700 transition'><Users className="h-4 w-4" />Diễn giả</TabsTrigger>
-          <TabsTrigger value="sponsors" className='flex-1 gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg hover:bg-gray-700 transition'><ImageIcon className="h-4 w-4" />Hỗ trợ</TabsTrigger>
-          <TabsTrigger value="faqs" className='flex-1 gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg hover:bg-gray-700 transition'><FileText className="h-4 w-4" />FAQ</TabsTrigger>
-          <TabsTrigger value="content" className='flex-1 gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg hover:bg-gray-700 transition'><Settings className="h-4 w-4" />Ảnh bìa</TabsTrigger>
-          <TabsTrigger value="form" className='flex-1 gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg hover:bg-gray-700 transition'><Settings className="h-4 w-4" />Form ĐK</TabsTrigger>
-        </TabsList>
-
-        {/* Registrations Tab */}
         <TabsContent value="registrations">
           <Card className="p-4 bg-gray-800 border-gray-700 shadow-xl">
             <div className="flex justify-between items-center mb-4">
@@ -458,7 +493,6 @@ export default function AdminDashboard() {
           </Card>
         </TabsContent>
 
-        {/* Analytics Tab */}
         <TabsContent value="analytics">
           <Card className="p-6 bg-gray-800 border-gray-700 shadow-xl">
             <h2 className="text-xl font-semibold mb-6">Thống kê Tổng quan</h2>
@@ -481,7 +515,6 @@ export default function AdminDashboard() {
           </Card>
         </TabsContent>
 
-        {/* Speakers Tab */}
         <TabsContent value="speakers">
           <Card className="p-4 bg-gray-800 border-gray-700 shadow-xl">
               <div className="flex justify-between items-center mb-4">
@@ -511,7 +544,6 @@ export default function AdminDashboard() {
           </Card>
         </TabsContent>
 
-        {/* Sponsors Tab */}
         <TabsContent value="sponsors">
             <Card className="p-4 bg-gray-800 border-gray-700 shadow-xl">
                 <div className="flex justify-between items-center mb-4">
@@ -541,7 +573,6 @@ export default function AdminDashboard() {
             </Card>
         </TabsContent>
 
-        {/* FAQs Tab */}
         <TabsContent value="faqs">
             <Card className="p-4 bg-gray-800 border-gray-700 shadow-xl">
                 <div className="flex justify-between items-center mb-4">
@@ -569,7 +600,6 @@ export default function AdminDashboard() {
             </Card>
         </TabsContent>
 
-        {/* Content Tab (Banner) */}
         <TabsContent value="content">
           <Card className="p-6 bg-gray-800 border-gray-700 shadow-xl">
             <h2 className="text-xl font-semibold mb-4">Cập nhật Ảnh bìa</h2>
@@ -585,7 +615,6 @@ export default function AdminDashboard() {
           </Card>
         </TabsContent>
 
-        {/* Form Fields Tab */}
         <TabsContent value="form">
             <Card className="p-6 bg-gray-800 border-gray-700 shadow-xl">
                 <div className="flex justify-between items-center mb-4">
@@ -615,103 +644,98 @@ export default function AdminDashboard() {
         </TabsContent>
       </Tabs>
 
-      {/* --- Universal Edit Modal --- */}
-      <Dialog open={isModalOpen} onOpenChange={closeModal}>
-        <DialogContent className="bg-gray-800 text-white border-gray-700">
-          <DialogHeader>
-            <DialogTitle className='text-2xl font-bold text-primary'>
+      <Dialog open={isModalOpen} onOpenChange={closeModal}>
+        <DialogContent className="bg-gray-800 text-white border-gray-700">
+          <DialogHeader>
+            <DialogTitle className='text-2xl font-bold text-primary'>
                 {editingType === 'speaker' && ((editingItem as Speaker)?.id.startsWith('new-') ? 'Thêm Diễn giả' : 'Chỉnh sửa Diễn giả')}
                 {editingType === 'sponsor' && ((editingItem as Sponsor)?.id.startsWith('new-') ? 'Thêm Đơn vị Hỗ trợ' : 'Chỉnh sửa Đơn vị Hỗ trợ')}
                 {editingType === 'faq' && ((editingItem as FAQ)?.id.startsWith('new-') ? 'Thêm Câu hỏi' : 'Chỉnh sửa Câu hỏi')}
                 {editingType === 'field' && ((editingItem as FormField)?.id.startsWith('new-') ? 'Thêm Trường Form' : 'Chỉnh sửa Trường Form')}
             </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            
-            {/* Speaker Form */}
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            
             {editingType === 'speaker' && editingItem && (
               <>
                 <Label className='text-gray-300'>Tên</Label>
-                <Input name="name" value={(editingItem as Speaker).name} onChange={handleInputChange} placeholder="Tên diễn giả" className="bg-gray-700 border-gray-600 text-white" />
+                <Input name="name" value={(editingItem as Speaker).name} onChange={handleInputChange} placeholder="Tên diễn giả" className="bg-gray-700 border-gray-600 text-white" />
                 <Label className='text-gray-300'>Chức vụ</Label>
-                <Input name="title" value={(editingItem as Speaker).title} onChange={handleInputChange} placeholder="Chức vụ" className="bg-gray-700 border-gray-600 text-white" />
+                <Input name="title" value={(editingItem as Speaker).title} onChange={handleInputChange} placeholder="Chức vụ" className="bg-gray-700 border-gray-600 text-white" />
                 <Label className='text-gray-300'>Tiểu sử</Label>
-                <Textarea name="bio" value={(editingItem as Speaker).bio} onChange={handleInputChange} placeholder="Tiểu sử" rows={5} className="bg-gray-700 border-gray-600 text-white" />
+                <Textarea name="bio" value={(editingItem as Speaker).bio} onChange={handleInputChange} placeholder="Tiểu sử" rows={5} className="bg-gray-700 border-gray-600 text-white" />
                 <Label className='text-gray-300'>Ảnh (Upload/URL)</Label>
-                <div className="flex items-center gap-4">
-                  <img src={fileToUpload ? URL.createObjectURL(fileToUpload) : (editingItem as Speaker).image_url || '/placeholder.svg'} alt="Speaker" className="w-20 h-20 rounded-full object-cover border-2 border-primary/50" />
-                  <Input name="image_upload" type="file" accept="image/*" onChange={handleFileChange} className="bg-gray-700 border-gray-600 text-white" />
-                </div>
+                <div className="flex items-center gap-4">
+                  <img src={fileToUpload ? URL.createObjectURL(fileToUpload) : (editingItem as Speaker).image_url || '/placeholder.svg'} alt="Speaker" className="w-20 h-20 rounded-full object-cover border-2 border-primary/50" />
+                  <Input name="image_upload" type="file" accept="image/*" onChange={handleFileChange} className="bg-gray-700 border-gray-600 text-white" />
+                </div>
                 <Label className='text-gray-300'>URL Ảnh (Ghi đè nếu không upload)</Label>
                 <Input name="image_url" value={(editingItem as Speaker).image_url} onChange={handleInputChange} placeholder="URL Ảnh" className="bg-gray-700 border-gray-600 text-white" />
               </>
             )}
 
-            {/* Sponsor Form */}
             {editingType === 'sponsor' && editingItem && (
               <>
                 <Label className='text-gray-300'>Tên đơn vị</Label>
-                <Input name="name" value={(editingItem as Sponsor).name} onChange={handleInputChange} placeholder="Tên đơn vị" className="bg-gray-700 border-gray-600 text-white" />
+                <Input name="name" value={(editingItem as Sponsor).name} onChange={handleInputChange} placeholder="Tên đơn vị" className="bg-gray-700 border-gray-600 text-white" />
                 <Label className='text-gray-300'>Loại hỗ trợ</Label>
-                <Input name="type" value={(editingItem as Sponsor).type} onChange={handleInputChange} placeholder="VD: Tổ chức chính, Tài trợ Vàng" className="bg-gray-700 border-gray-600 text-white" />
+                <Input name="type" value={(editingItem as Sponsor).type} onChange={handleInputChange} placeholder="VD: Tổ chức chính, Tài trợ Vàng" className="bg-gray-700 border-gray-600 text-white" />
                 <Label className='text-gray-300'>Website/Link</Label>
-                <Input name="website" value={(editingItem as Sponsor).website} onChange={handleInputChange} placeholder="https://website.com" className="bg-gray-700 border-gray-600 text-white" />
+                <Input name="website" value={(editingItem as Sponsor).website} onChange={handleInputChange} placeholder="https://website.com" className="bg-gray-700 border-gray-600 text-white" />
                 <Label className='text-gray-300'>Logo (Upload/URL)</Label>
-                <div className="flex items-center gap-4">
-                  <img src={fileToUpload ? URL.createObjectURL(fileToUpload) : (editingItem as Sponsor).logo_url || '/placeholder.svg'} alt="Sponsor Logo" className="w-20 h-20 object-contain p-1 border rounded-md border-gray-600 bg-white" />
-                  <Input name="logo_upload" type="file" accept="image/*" onChange={handleFileChange} className="bg-gray-700 border-gray-600 text-white" />
-                </div>
+                <div className="flex items-center gap-4">
+                  <img src={fileToUpload ? URL.createObjectURL(fileToUpload) : (editingItem as Sponsor).logo_url || '/placeholder.svg'} alt="Sponsor Logo" className="w-20 h-20 object-contain p-1 border rounded-md border-gray-600 bg-white" />
+                  <Input name="logo_upload" type="file" accept="image/*" onChange={handleFileChange} className="bg-gray-700 border-gray-600 text-white" />
+                </div>
                 <Label className='text-gray-300'>Logo URL (Ghi đè nếu không upload)</Label>
                 <Input name="logo_url" value={(editingItem as Sponsor).logo_url} onChange={handleInputChange} placeholder="URL Logo" className="bg-gray-700 border-gray-600 text-white" />
               </>
             )}
 
-            {/* FAQ Form */}
             {editingType === 'faq' && editingItem && (
               <>
                 <Label className='text-gray-300'>Câu hỏi</Label>
-                <Input name="question" value={(editingItem as FAQ).question} onChange={handleInputChange} placeholder="Câu hỏi thường gặp" className="bg-gray-700 border-gray-600 text-white" />
+                <Input name="question" value={(editingItem as FAQ).question} onChange={handleInputChange} placeholder="Câu hỏi thường gặp" className="bg-gray-700 border-gray-600 text-white" />
                 <Label className='text-gray-300'>Trả lời</Label>
-                <Textarea name="answer" value={(editingItem as FAQ).answer} onChange={handleInputChange} placeholder="Câu trả lời" rows={4} className="bg-gray-700 border-gray-600 text-white" />
+                <Textarea name="answer" value={(editingItem as FAQ).answer} onChange={handleInputChange} placeholder="Câu trả lời" rows={4} className="bg-gray-700 border-gray-600 text-white" />
               </>
             )}
 
-            {/* Form Field Form */}
             {editingType === 'field' && editingItem && (
               <>
-                <div className="space-y-2">
-                    <Label htmlFor="field-label" className='text-gray-300'>Nhãn hiển thị</Label>
-                    <Input name="label" id="field-label" value={(editingItem as FormField).label} onChange={handleInputChange} placeholder="Họ và tên" className="bg-gray-700 border-gray-600 text-white" />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="field-name" className='text-gray-300'>Tên trường (Tự động tạo)</Label>
-                    <Input name="name" id="field-name" value={(editingItem as FormField).name} readOnly placeholder="full_name" className="bg-gray-700 border-gray-600 text-gray-400" />
-                </div>
-                <div className="space-y-2">
-                    <Label className='text-gray-300'>Loại trường</Label>
-                    <Select name="type" value={(editingItem as FormField).type} onValueChange={(v) => handleInputChange({ target: { name: 'type', value: v } } as any)}>
-                        <SelectTrigger className="bg-gray-700 border-gray-600 text-white"><SelectValue /></SelectTrigger>
-                        <SelectContent className="bg-gray-800">
-                            <SelectItem value="text">Text (Văn bản)</SelectItem>
-                            <SelectItem value="email">Email</SelectItem>
-                            <SelectItem value="tel">Phone (Số ĐT)</SelectItem>
-                            <SelectItem value="number">Number (Số)</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="flex items-center space-x-2 pt-2">
+                <div className="space-y-2">
+                    <Label htmlFor="field-label" className='text-gray-300'>Nhãn hiển thị</Label>
+                    <Input name="label" id="field-label" value={(editingItem as FormField).label} onChange={handleInputChange} placeholder="Họ và tên" className="bg-gray-700 border-gray-600 text-white" />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="field-name" className='text-gray-300'>Tên trường (Tự động tạo)</Label>
+                    <Input name="name" id="field-name" value={(editingItem as FormField).name} readOnly placeholder="full_name" className="bg-gray-700 border-gray-600 text-gray-400" />
+                </div>
+                <div className="space-y-2">
+                    <Label className='text-gray-300'>Loại trường</Label>
+                    <Select name="type" value={(editingItem as FormField).type} onValueChange={(v) => handleInputChange({ target: { name: 'type', value: v } } as any)}>
+                        <SelectTrigger className="bg-gray-700 border-gray-600 text-white"><SelectValue /></SelectTrigger>
+                        <SelectContent className="bg-gray-800">
+                            <SelectItem value="text">Text (Văn bản)</SelectItem>
+                            <SelectItem value="email">Email</SelectItem>
+                            <SelectItem value="tel">Phone (Số ĐT)</SelectItem>
+                            <SelectItem value="number">Number (Số)</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="flex items-center space-x-2 pt-2">
                     <Checkbox id="required" name="required" checked={(editingItem as FormField).required} onCheckedChange={(c) => handleCheckboxChange('required', c as boolean)} className='border-gray-600 data-[state=checked]:bg-blue-600' />
-                    <Label htmlFor="required">Là trường bắt buộc?</Label>
-                </div>
+                    <Label htmlFor="required">Là trường bắt buộc?</Label>
+                </div>
               </>
             )}
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={closeModal} className="bg-gray-700 hover:bg-gray-600 border-gray-600 text-white">Hủy</Button>
-            <Button onClick={handleSave} disabled={loading} className="bg-primary hover:bg-primary/90 text-white">{loading ? 'Đang lưu...' : 'Lưu'}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  )
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={closeModal} className="bg-gray-700 hover:bg-gray-600 border-gray-600 text-white">Hủy</Button>
+            <Button onClick={handleSave} disabled={loading} className="bg-primary hover:bg-primary/90 text-white">{loading ? 'Đang lưu...' : 'Lưu'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
 }
