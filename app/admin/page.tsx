@@ -231,7 +231,7 @@ export default function AdminDashboard() {
     let error: any = null;
 
     if (isNew) {
-      ({ error } = await supabase.from(table).insert(dbItem));
+      ({ error } = await supabase.from(table).insert([dbItem]));
     } else {
       ({ error } = await supabase.from(table).update(dbItem).eq('id', id));
     }
