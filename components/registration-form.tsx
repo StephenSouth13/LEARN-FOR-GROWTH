@@ -25,7 +25,6 @@ export default function RegistrationForm({ formFields }: RegistrationFormProps) 
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const supabase = getSupabaseBrowser()
 
   const initialFormData = formFields.reduce((acc, field) => {
     acc[field.name] = ''
@@ -40,6 +39,7 @@ export default function RegistrationForm({ formFields }: RegistrationFormProps) 
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
+    const supabase = getSupabaseBrowser()
 
     // Ánh xạ tên trường từ camelCase (frontend) sang snake_case (database)
     const registrationData: { [key: string]: any } = {}

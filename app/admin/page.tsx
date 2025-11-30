@@ -65,7 +65,6 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const supabase = getSupabaseBrowser()
 
   const [registrations, setRegistrations] = useState<Registration[]>([])
   const [speakers, setSpeakers] = useState<Speaker[]>([])
@@ -81,7 +80,8 @@ export default function AdminDashboard() {
 
   const fetchData = useCallback(async () => {
     setLoading(true)
-    
+    const supabase = getSupabaseBrowser()
+
     try {
       const [speakersRes, sponsorsRes, faqsRes, registrationsRes, settingsRes] = await Promise.all([
         supabase.from('speakers').select('id, name, title, bio, image_url').order('created_at'),
@@ -129,12 +129,14 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const getSession = async () => {
+      const supabase = getSupabaseBrowser()
       const { data: { session } } = await supabase.auth.getSession()
       setUser(session?.user ?? null)
       setLoading(false)
     }
     getSession()
 
+    const supabase = getSupabaseBrowser()
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user ?? null)
@@ -200,14 +202,15 @@ export default function AdminDashboard() {
 
   const handleSave = async () => {
     if (!editingItem || !editingType) return
-    
+
     if (editingType === 'field') {
       await handleFormFieldSave()
       return
     }
-    
+
     setLoading(true)
     let itemToSave = { ...editingItem } as any
+    const supabase = getSupabaseBrowser()
 
     try {
       if (fileToUpload) {
@@ -250,13 +253,14 @@ export default function AdminDashboard() {
 
   const handleDelete = async (id: string, type: ItemType) => {
     if (!confirm('Bạn chắc chắn muốn xóa mục này?')) return
-    
+
     if (type === 'field') {
       await handleFormFieldDelete(id)
       return
     }
-    
+
     setLoading(true)
+    const supabase = getSupabaseBrowser()
     try {
       const { error } = await supabase.from(`${type}s`).delete().eq('id', id)
       if (error) {
@@ -276,16 +280,17 @@ export default function AdminDashboard() {
   const handleFormFieldSave = async () => {
     if (!editingItem) return
     const field = editingItem as FormField
-    
+    const supabase = getSupabaseBrowser()
+
     if (!field.name || field.name.includes(' ')) {
         alert("Tên trường (Field Name) không được để trống và không được chứa khoảng trắng.")
         return
     }
-    
+
     const updatedFields = field.id.startsWith('new-')
       ? [...formFields, { ...field, id: `field-${Date.now()}` }]
       : formFields.map(f => f.id === field.id ? field : f)
-      
+
     setLoading(true)
     try {
       const { error } = await supabase.from('settings').upsert({ key: 'form_fields', value: JSON.stringify(updatedFields) }, { onConflict: 'key' })
@@ -307,6 +312,7 @@ export default function AdminDashboard() {
   const handleFormFieldDelete = async (id: string) => {
     if (!confirm('Bạn chắc chắn muốn xóa trường này?')) return
     const updatedFields = formFields.filter(f => f.id !== id)
+    const supabase = getSupabaseBrowser()
     setLoading(true)
     try {
       const { error } = await supabase.from('settings').upsert({ key: 'form_fields', value: JSON.stringify(updatedFields) }, { onConflict: 'key' })
@@ -328,6 +334,7 @@ export default function AdminDashboard() {
     if (!file) return
 
     setLoading(true)
+    const supabase = getSupabaseBrowser()
     try {
       const filePath = `public/banner/${Date.now()}-${file.name}`
       const { error: uploadError } = await supabase.storage.from('images').upload(filePath, file)
@@ -384,6 +391,7 @@ export default function AdminDashboard() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    const supabase = getSupabaseBrowser()
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) alert(`Đăng nhập thất bại: ${error.message}`)
@@ -396,6 +404,7 @@ export default function AdminDashboard() {
   }
 
   const handleLogout = async () => {
+    const supabase = getSupabaseBrowser()
     await supabase.auth.signOut()
     setUser(null)
   }
