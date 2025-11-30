@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card'
 import { CheckCircle, AlertTriangle } from 'lucide-react'
 import { useLanguage } from '@/lib/language-context'
 import { translations } from '@/lib/i18n'
-import { supabase } from '@/lib/supabase-browser' // Lấy instance supabase đã export
+import { getSupabaseBrowser } from '@/lib/supabase-browser'
 interface FormField {
   id: string
   name: string
@@ -39,6 +39,7 @@ export default function RegistrationForm({ formFields }: RegistrationFormProps) 
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
+    const supabase = getSupabaseBrowser()
 
     // Ánh xạ tên trường từ camelCase (frontend) sang snake_case (database)
     const registrationData: { [key: string]: any } = {}
