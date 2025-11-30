@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card'
 import { CheckCircle, AlertTriangle } from 'lucide-react'
 import { useLanguage } from '@/lib/language-context'
 import { translations } from '@/lib/i18n'
-import { supabase } from '@/lib/supabase-browser' // Lấy instance supabase đã export
+import { getSupabaseBrowser } from '@/lib/supabase-browser'
 interface FormField {
   id: string
   name: string
@@ -25,6 +25,7 @@ export default function RegistrationForm({ formFields }: RegistrationFormProps) 
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const supabase = getSupabaseBrowser()
 
   const initialFormData = formFields.reduce((acc, field) => {
     acc[field.name] = ''

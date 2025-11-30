@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
-import { supabase } from '@/lib/supabase-browser' 
+import { getSupabaseBrowser } from '@/lib/supabase-browser' 
 import type { User } from '@supabase/supabase-js'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -65,6 +65,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const supabase = getSupabaseBrowser()
 
   const [registrations, setRegistrations] = useState<Registration[]>([])
   const [speakers, setSpeakers] = useState<Speaker[]>([])
